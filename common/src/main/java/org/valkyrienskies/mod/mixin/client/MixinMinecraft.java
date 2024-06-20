@@ -169,4 +169,15 @@ public abstract class MixinMinecraft
             deleteShipObjectWorldClient();
         }
     }
+
+    @Inject(
+        method = "setLevel",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/Minecraft;updateLevelInEngines(Lnet/minecraft/client/multiplayer/ClientLevel;)V"
+        )
+    )
+    private void postSetLevel(final CallbackInfo ci) {
+        ((IShipObjectWorldClientCreator) this).createShipObjectWorldClient();
+    }
 }

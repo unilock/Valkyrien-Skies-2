@@ -39,6 +39,8 @@ public abstract class MixinMinecraft
     private static final Logger log = LogManager.getLogger("VS2 MixinMinecraft");
     @Unique
     private static long lastLog = System.currentTimeMillis();
+    @Unique
+    private boolean spawned = false;
 
     @Shadow
     private boolean pause;
@@ -178,6 +180,8 @@ public abstract class MixinMinecraft
         )
     )
     private void postSetLevel(final CallbackInfo ci) {
+        if (spawned) return;
         ((IShipObjectWorldClientCreator) this).createShipObjectWorldClient();
+        spawned = true;
     }
 }

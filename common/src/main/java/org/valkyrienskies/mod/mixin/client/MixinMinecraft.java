@@ -39,8 +39,6 @@ public abstract class MixinMinecraft
     private static final Logger log = LogManager.getLogger("VS2 MixinMinecraft");
     @Unique
     private static long lastLog = System.currentTimeMillis();
-    @Unique
-    private boolean spawned = false;
 
     @Shadow
     private boolean pause;
@@ -163,6 +161,16 @@ public abstract class MixinMinecraft
     }
 
     @Inject(
+        method = "setLevel",
+        at = @At("TAIL")
+    )
+    private void postSetLevel(final CallbackInfo ci) {
+        if (shipObjectWorld == null) {
+            createShipObjectWorldClient();
+        }
+    }
+
+    @Inject(
         method = "clearLevel",
         at = @At("TAIL")
     )
@@ -170,18 +178,5 @@ public abstract class MixinMinecraft
         if (shipObjectWorld != null) {
             deleteShipObjectWorldClient();
         }
-    }
-
-    @Inject(
-        method = "setLevel",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/Minecraft;updateLevelInEngines(Lnet/minecraft/client/multiplayer/ClientLevel;)V"
-        )
-    )
-    private void postSetLevel(final CallbackInfo ci) {
-        if (spawned) return;
-        ((IShipObjectWorldClientCreator) this).createShipObjectWorldClient();
-        spawned = true;
     }
 }
